@@ -33,12 +33,9 @@ namespace cs_jet
                 throw new Exception();
             }
 
-            JObject infoJson = new JObject();
-            infoJson["jsonrpc"] = "2.0";
-            infoJson["id"] = Interlocked.Increment(ref requestID);
-            infoJson["method"] = "info";
-            string json = JsonConvert.SerializeObject(infoJson);
-            io.sendMessage(Encoding.UTF8.GetBytes(json));
+            int id = Interlocked.Increment(ref requestID);
+            JetMethod info = new JetMethod(JetMethod.INFO, null, id);
+            io.sendMessage(Encoding.UTF8.GetBytes(info.getJson()));
         }
 
         public static void HandleIncomingMessage(object obj, string arg)
