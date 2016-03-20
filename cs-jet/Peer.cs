@@ -82,7 +82,6 @@ namespace cs_jet
                     if (openFetches.ContainsKey(fetchId))
                     {
                         fetcher = openFetches[fetchId];
-                        openFetches.Remove(fetchId);
                     }
                 }
                 if (fetcher != null)
