@@ -27,12 +27,6 @@ namespace cs_jet
 
         public void info(Action<JObject> responseCallback)
         {
-            if (!io.isConnected())
-            {
-                // TODO: throw better excewption
-                throw new Exception();
-            }
-
             int id = Interlocked.Increment(ref requestID);
             JetMethod info = new JetMethod(JetMethod.INFO, null, id);
             io.sendMessage(Encoding.UTF8.GetBytes(info.getJson()));

@@ -52,6 +52,12 @@ namespace cs_jet
 
         public void sendMessage(byte[] buffer)
         {
+            if (!isConnected())
+            {
+                // TODO: throw better excewption
+                throw new Exception();
+            }
+
             int length = IPAddress.HostToNetworkOrder(buffer.Length);
             SocketAsyncEventArgs buf = new SocketAsyncEventArgs();
             var list = new List<ArraySegment<byte>>();
