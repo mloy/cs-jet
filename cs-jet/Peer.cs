@@ -98,12 +98,41 @@ namespace cs_jet
         public void HandleIncomingMessage(object obj, string arg)
         {
             // TODO: handle batch responses
-            JObject json = JObject.Parse(arg);
+            JToken json = JToken.Parse(arg);
             if (json == null)
             {
                 return;
             }
 
+            if (json.Type == JTokenType.Object)
+            {
+                handleMessage((JObject)json);
+                return;
+            }
+
+            if (json.Type == JTokenType.Array)
+            {
+                foreach (var item in json.Children())
+                {
+                    if (item.Type == JTokenType.Object)
+                    {
+                        handleMessage((JObject)item);
+                    }
+                }
+                return;
+            }
+        }
+
+        public void HandleConnect(object obj, int arg)
+        {
+            if (HandlePeerConnect != null)
+            {
+                HandlePeerConnect(this, arg);
+            }
+        }
+
+        void handleMessage(JObject json)
+        {
             JToken fetchIdToken = getFetchId(json);
             if (fetchIdToken != null)
             {
@@ -115,14 +144,6 @@ namespace cs_jet
             {
                 handleResponse(json);
                 return;
-            }
-        }
-
-        public void HandleConnect(object obj, int arg)
-        {
-            if (HandlePeerConnect != null)
-            {
-                HandlePeerConnect(this, arg);
             }
         }
 
