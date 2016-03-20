@@ -27,7 +27,10 @@ namespace cs_jet
 
         internal void callResponseCallback(JObject response)
         {
-            responseCallback(response);
+            if (responseCallback != null)
+            {
+                responseCallback(response);
+            }
         }
 
         internal string getJson()
