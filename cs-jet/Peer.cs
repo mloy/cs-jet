@@ -38,14 +38,15 @@ namespace cs_jet
             executeMethod(info, id);
         }
 
-        public FetchId fetch(Action<JToken> fetchCallback, Action<JToken> responseCallback)
+        public FetchId fetch(Matcher matcher, Action<JToken> fetchCallback, Action<JToken> responseCallback)
         {
             int fetchId = Interlocked.Increment(ref fetchIdCounter);
             JetFetcher fetcher = new JetFetcher(fetchCallback);
             registerFetcher(fetchId, fetcher);
 
             JObject parameters = new JObject();
-            parameters["path"] = new JObject();
+            parameters["path"] = fillPath(matcher);
+            parameters["caseInsensitive"] = matcher.caseInsensitive;
             parameters["id"] = fetchId;
             int requestId = Interlocked.Increment(ref requestIdCounter);
             JetMethod fetch = new JetMethod(JetMethod.FETCH, parameters, requestId, responseCallback);
@@ -66,6 +67,7 @@ namespace cs_jet
 
         public void HandleIncomingMessage(object obj, string arg)
         {
+            // TODO: handle batch responses
             JObject json = JObject.Parse(arg);
             if (json == null)
             {
@@ -147,6 +149,32 @@ namespace cs_jet
                     fetcher.callFetchCallback(parameters);
                 }
             }
+        }
+
+        private JObject fillPath(Matcher matcher)
+        {
+            JObject path = new JObject();
+            if (!String.IsNullOrEmpty(matcher.contains))
+            {
+                path["contains"] = matcher.contains;
+            }
+            if (!String.IsNullOrEmpty(matcher.startsWith))
+            {
+                path["startsWith"] = matcher.startsWith;
+            }
+            if (!String.IsNullOrEmpty(matcher.endsWith))
+            {
+                path["endsWith"] = matcher.endsWith;
+            }
+            if (!String.IsNullOrEmpty(matcher.equals))
+            {
+                path["equals"] = matcher.equals;
+            }
+            if (!String.IsNullOrEmpty(matcher.equalsNot))
+            {
+                path["equalsNot"] = matcher.equalsNot;
+            }
+            return path;
         }
 
         private bool isResponse(JObject json)

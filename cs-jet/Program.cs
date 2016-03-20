@@ -21,10 +21,13 @@ namespace cs_jet
             waitHandle.WaitOne();
             waitHandle.Reset();
 
-            FetchId fetchId = peer.fetch(FetchCallback, ResponceCallback);
+            Matcher matcher = new Matcher();
+            matcher.endsWith = "state";
+            matcher.caseInsensitive = true;
+            FetchId fetchId = peer.fetch(matcher, FetchCallback, ResponceCallback);
             Thread.Sleep(5000);
-            //peer.unfetch(fetchId, ResponceCallback);
-            //Thread.Sleep(5000);
+            peer.unfetch(fetchId, ResponceCallback);
+            Thread.Sleep(5000);
             peer.info(ResponceCallback);
 
             Console.ReadKey();

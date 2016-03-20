@@ -47,6 +47,7 @@
     <Compile Include="FetchId.cs" />
     <Compile Include="JetFetcher.cs" />
     <Compile Include="JetMethod.cs" />
+    <Compile Include="Matcher.cs" />
     <Compile Include="Peer.cs" />
     <Compile Include="PeerIo.cs" />
     <Compile Include="Program.cs" />
