@@ -9,7 +9,7 @@ namespace cs_jet
     class Peer
     {
         private PeerIo io;
-        private int id = 0;
+        private int requestID = 0;
 
         public event EventHandler<int> HandlePeerConnect;
 
@@ -25,16 +25,17 @@ namespace cs_jet
             io.connect();
         }
 
-        public void info()
+        public void info(Action<JObject> responseCallback)
         {
             if (!io.isConnected())
             {
+                // TODO: throw better excewption
                 throw new Exception();
             }
 
             JObject infoJson = new JObject();
             infoJson["jsonrpc"] = "2.0";
-            infoJson["id"] = Interlocked.Increment(ref id);
+            infoJson["id"] = Interlocked.Increment(ref requestID);
             infoJson["method"] = "info";
             string json = JsonConvert.SerializeObject(infoJson);
             io.sendMessage(Encoding.UTF8.GetBytes(json));

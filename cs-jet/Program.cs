@@ -1,9 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Net;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
 
 namespace cs_jet
@@ -24,9 +21,9 @@ namespace cs_jet
             waitHandle.WaitOne();
             waitHandle.Reset();
 
-            peer.info();
+            peer.info(ResponceCallback);
             Thread.Sleep(10000);
-            peer.info();
+            peer.info(ResponceCallback);
 
             Console.ReadKey();
         }
@@ -34,6 +31,11 @@ namespace cs_jet
         public static void HandleConnect(object obj, int args)
         {
             waitHandle.Set();
+        }
+
+        public static void ResponceCallback(JObject response)
+        {
+            Console.WriteLine(response);
         }
     }
 }
