@@ -84,6 +84,16 @@ namespace Hbm.Devices.Jet
             return new FetchId(fetchId);
         }
 
+        public void set(string path, JToken value, Action<JToken> responseCallback)
+        {
+            JObject parameters = new JObject();
+            parameters["path"] = path;
+            parameters["value"] = value;
+            int requestId = Interlocked.Increment(ref requestIdCounter);
+            JetMethod set = new JetMethod(JetMethod.SET, parameters, requestId, responseCallback);
+            executeMethod(set, requestId);
+        }
+
         public void unfetch(FetchId fetchId, Action<JToken> responseCallback)
         {
             unregisterFetcher(fetchId.getId());

@@ -56,11 +56,16 @@ namespace JetExample
             Matcher matcher = new Matcher();
             matcher.endsWith = "state";
             matcher.caseInsensitive = true;
-            FetchId fetchId = peer.fetch(matcher, FetchCallback, ResponceCallback);
+            FetchId fetchId = peer.fetch(matcher, FetchCallback, ResponseCallback);
             Thread.Sleep(5000);
-            peer.unfetch(fetchId, ResponceCallback);
+
+            JValue value = new JValue(42);
+            peer.set("theState", value, ResponseCallback);
             Thread.Sleep(5000);
-            peer.info(ResponceCallback);
+
+            peer.unfetch(fetchId, ResponseCallback);
+            Thread.Sleep(5000);
+            peer.info(ResponseCallback);
 
             Console.ReadKey();
         }
@@ -76,7 +81,7 @@ namespace JetExample
             Console.WriteLine(fetchEvent);
         }
 
-        public static void ResponceCallback(JToken response)
+        public static void ResponseCallback(JToken response)
         {
             Console.WriteLine("Got response!");
             Console.WriteLine(response);

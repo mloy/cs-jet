@@ -37,6 +37,7 @@ namespace Hbm.Devices.Jet
     internal class JetMethod
     {
         internal static readonly string INFO = "info";
+        internal static readonly string SET = "set";
         internal static readonly string FETCH = "fetch";
         internal static readonly string UNFETCH = "unfetch";
 
