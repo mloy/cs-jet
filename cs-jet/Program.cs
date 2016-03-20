@@ -21,8 +21,10 @@ namespace cs_jet
             waitHandle.WaitOne();
             waitHandle.Reset();
 
-            peer.info(ResponceCallback);
-            Thread.Sleep(10000);
+            FetchId fetchId = peer.fetch(FetchCallback, ResponceCallback);
+            Thread.Sleep(5000);
+            //peer.unfetch(fetchId, ResponceCallback);
+            //Thread.Sleep(5000);
             peer.info(ResponceCallback);
 
             Console.ReadKey();
@@ -33,8 +35,15 @@ namespace cs_jet
             waitHandle.Set();
         }
 
-        public static void ResponceCallback(JObject response)
+        public static void FetchCallback(JToken fetchEvent)
         {
+            Console.WriteLine("fetch fired");
+            Console.WriteLine(fetchEvent);
+        }
+
+        public static void ResponceCallback(JToken response)
+        {
+            Console.WriteLine("Got response!");
             Console.WriteLine(response);
         }
     }

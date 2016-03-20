@@ -10,14 +10,17 @@ namespace cs_jet
     class Peer
     {
         private PeerIo io;
-        private int requestID;
+        private int requestIdCounter;
+        private int fetchIdCounter;
         private Dictionary<int, JetMethod> openRequests;
+        private Dictionary<int, JetFetcher> openFetches;
 
         public event EventHandler<int> HandlePeerConnect;
 
         public Peer(PeerIo io)
         {
             openRequests = new Dictionary<int, JetMethod>();
+            openFetches = new Dictionary<int, JetFetcher>();
             this.io = io;
             io.HandleIncomingMessage += HandleIncomingMessage;
         }
@@ -28,16 +31,70 @@ namespace cs_jet
             io.connect();
         }
 
-        public void info(Action<JObject> responseCallback)
+        public void info(Action<JToken> responseCallback)
         {
-            int id = Interlocked.Increment(ref requestID);
+            int id = Interlocked.Increment(ref requestIdCounter);
             JetMethod info = new JetMethod(JetMethod.INFO, null, id, responseCallback);
             executeMethod(info, id);
+        }
+
+        public FetchId fetch(Action<JToken> fetchCallback, Action<JToken> responseCallback)
+        {
+            int fetchId = Interlocked.Increment(ref fetchIdCounter);
+            JetFetcher fetcher = new JetFetcher(fetchCallback);
+            registerFetcher(fetchId, fetcher);
+
+            JObject parameters = new JObject();
+            parameters["path"] = new JObject();
+            parameters["id"] = fetchId;
+            int requestId = Interlocked.Increment(ref requestIdCounter);
+            JetMethod fetch = new JetMethod(JetMethod.FETCH, parameters, requestId, responseCallback);
+            executeMethod(fetch, requestId);
+            return new FetchId(fetchId);
+        }
+
+        public void unfetch(FetchId fetchId, Action<JToken> responseCallback)
+        {
+            unregisterFetcher(fetchId.getId());
+
+            JObject parameters = new JObject();
+            parameters["id"] = fetchId.getId();
+            int requestId = Interlocked.Increment(ref requestIdCounter);
+            JetMethod unfetch = new JetMethod(JetMethod.UNFETCH, parameters, requestId, responseCallback);
+            executeMethod(unfetch, requestId);
         }
 
         public void HandleIncomingMessage(object obj, string arg)
         {
             JObject json = JObject.Parse(arg);
+            if (json == null)
+            {
+                return;
+            }
+
+            JToken fetchIdToken = getFetchId(json);
+            if (fetchIdToken != null)
+            {
+                int fetchId = fetchIdToken.ToObject<int>();
+                JetFetcher fetcher = null;
+                lock(openFetches)
+                {
+                    if (openFetches.ContainsKey(fetchId))
+                    {
+                        fetcher = openFetches[fetchId];
+                        openFetches.Remove(fetchId);
+                    }
+                }
+                if (fetcher != null)
+                {
+                    JToken parameters = json["params"];
+                    if (parameters.Type != JTokenType.Null)
+                    {
+                        fetcher.callFetchCallback(parameters);
+                    }
+                }
+            }
+
             JToken token = json["id"];
             if (token != null)
             {
@@ -56,8 +113,6 @@ namespace cs_jet
                     method.callResponseCallback(json);
                 }
             }
-            
-            Console.WriteLine(json);
         }
 
         public void HandleConnect(object obj, int arg)
@@ -75,6 +130,32 @@ namespace cs_jet
                 openRequests.Add(id, method);
             }
             io.sendMessage(Encoding.UTF8.GetBytes(method.getJson()));
+        }
+
+        private void registerFetcher(int fetchId, JetFetcher fetcher)
+        {
+            lock(openFetches)
+            {
+                openFetches.Add(fetchId, fetcher);
+            }
+        }
+
+        private void unregisterFetcher(int fetchId)
+        {
+            lock(openFetches)
+            {
+                openFetches.Remove(fetchId);
+            }
+        }
+
+        private JToken getFetchId(JObject json)
+        {
+            JToken methodToken = json["method"];
+            if ((methodToken != null) && (methodToken.Type == JTokenType.Integer))
+            {
+                return methodToken;
+            }
+            return null;
         }
     }
 }

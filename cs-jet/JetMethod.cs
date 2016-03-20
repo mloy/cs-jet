@@ -7,11 +7,13 @@ namespace cs_jet
     internal class JetMethod
     {
         internal static readonly string INFO = "info";
+        internal static readonly string FETCH = "fetch";
+        internal static readonly string UNFETCH = "unfetch";
 
         private JObject data;
-        private Action<JObject> responseCallback;
+        private Action<JToken> responseCallback;
 
-        internal JetMethod(string method, JObject parameters, int requestId, Action<JObject> responseCallback)
+        internal JetMethod(string method, JObject parameters, int requestId, Action<JToken> responseCallback)
         {
             this.responseCallback = responseCallback;
             JObject json = new JObject();
@@ -25,7 +27,7 @@ namespace cs_jet
             data = json;
         }
 
-        internal void callResponseCallback(JObject response)
+        internal void callResponseCallback(JToken response)
         {
             if (responseCallback != null)
             {
