@@ -75,42 +75,14 @@ namespace cs_jet
             JToken fetchIdToken = getFetchId(json);
             if (fetchIdToken != null)
             {
-                int fetchId = fetchIdToken.ToObject<int>();
-                JetFetcher fetcher = null;
-                lock(openFetches)
-                {
-                    if (openFetches.ContainsKey(fetchId))
-                    {
-                        fetcher = openFetches[fetchId];
-                    }
-                }
-                if (fetcher != null)
-                {
-                    JToken parameters = json["params"];
-                    if (parameters.Type != JTokenType.Null)
-                    {
-                        fetcher.callFetchCallback(parameters);
-                    }
-                }
+                handleFetch(fetchIdToken.ToObject<int>(), json);
+                return;
             }
 
-            JToken token = json["id"];
-            if (token != null)
+            if (isResponse(json))
             {
-                int id = token.ToObject<int>();
-                JetMethod method = null;
-                lock (openRequests)
-                {
-                    if (openRequests.ContainsKey(id))
-                    {
-                        method = openRequests[id];
-                        openRequests.Remove(id);
-                    }
-                }
-                if (method != null)
-                {
-                    method.callResponseCallback(json);
-                }
+                handleResponse(json);
+                return;
             }
         }
 
@@ -155,6 +127,58 @@ namespace cs_jet
                 return methodToken;
             }
             return null;
+        }
+
+        private void handleFetch(int fetchId, JObject json)
+        {
+            JetFetcher fetcher = null;
+            lock (openFetches)
+            {
+                if (openFetches.ContainsKey(fetchId))
+                {
+                    fetcher = openFetches[fetchId];
+                }
+            }
+            if (fetcher != null)
+            {
+                JToken parameters = json["params"];
+                if (parameters.Type != JTokenType.Null)
+                {
+                    fetcher.callFetchCallback(parameters);
+                }
+            }
+        }
+
+        private bool isResponse(JObject json)
+        {
+            JToken methodToken = json["method"];
+            if ((methodToken == null) || (methodToken.ToObject<String>() == null))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void handleResponse(JObject json)
+        {
+            JToken token = json["id"];
+            if (token != null)
+            {
+                int id = token.ToObject<int>();
+                JetMethod method = null;
+                lock (openRequests)
+                {
+                    if (openRequests.ContainsKey(id))
+                    {
+                        method = openRequests[id];
+                        openRequests.Remove(id);
+                    }
+                }
+                if (method != null)
+                {
+                    method.callResponseCallback(json);
+                }
+            }
         }
     }
 }
