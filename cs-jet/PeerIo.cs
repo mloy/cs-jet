@@ -30,7 +30,7 @@
 
 using System;
 
-namespace cs_jet
+namespace Hbm.Devices.Jet
 {
     interface PeerIo
     {

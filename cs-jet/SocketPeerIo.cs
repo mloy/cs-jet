@@ -35,7 +35,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace cs_jet
+namespace Hbm.Devices.Jet
 {
     class SocketPeerIo : PeerIo
     {

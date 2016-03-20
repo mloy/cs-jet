@@ -30,7 +30,7 @@
 
 using System.Threading;
 
-namespace cs_jet
+namespace Hbm.Devices.Jet
 {
     public class FetchId
     {

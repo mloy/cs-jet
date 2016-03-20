@@ -32,7 +32,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace cs_jet
+namespace Hbm.Devices.Jet
 {
     internal class JetMethod
     {

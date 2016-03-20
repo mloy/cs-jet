@@ -28,7 +28,7 @@
 //
 // </copyright>
 
-namespace cs_jet
+namespace Hbm.Devices.Jet
 {
     public class Matcher
     {

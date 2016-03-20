@@ -35,7 +35,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace cs_jet
+namespace Hbm.Devices.Jet
 {
     class Peer
     {
