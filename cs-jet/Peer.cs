@@ -37,7 +37,7 @@ using System.Threading;
 
 namespace Hbm.Devices.Jet
 {
-    class Peer
+    public class Peer
     {
         private PeerIo io;
         private int requestIdCounter;

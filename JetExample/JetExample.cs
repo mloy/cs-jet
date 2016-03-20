@@ -1,4 +1,4 @@
-﻿// <copyright file="Program.cs" company="Hottinger Baldwin Messtechnik GmbH">
+﻿// <copyright file="JetExample.cs" company="Hottinger Baldwin Messtechnik GmbH">
 //
 // CS Jet, a library to communicate with Jet IPC.
 //
@@ -33,9 +33,11 @@ using System;
 using System.Net;
 using System.Threading;
 
-namespace Hbm.Devices.Jet
+using Hbm.Devices.Jet;
+
+namespace JetExample
 {
-    class Program
+    class JetExample
     {
         private static readonly EventWaitHandle waitHandle = new AutoResetEvent(false);
 

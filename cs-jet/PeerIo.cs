@@ -32,7 +32,7 @@ using System;
 
 namespace Hbm.Devices.Jet
 {
-    interface PeerIo
+    public interface PeerIo
     {
         void connect();
         bool isConnected();

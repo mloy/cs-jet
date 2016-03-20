@@ -37,7 +37,7 @@ using System.Text;
 
 namespace Hbm.Devices.Jet
 {
-    class SocketPeerIo : PeerIo
+    public class SocketPeerIo : PeerIo
     {
         static readonly int receiveBufferSize = 20000;
         private byte[] receiveBuffer = new byte[receiveBufferSize];
